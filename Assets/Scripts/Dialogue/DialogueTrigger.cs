@@ -20,14 +20,16 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
         {
+            gameObject.transform.parent.GetComponent<Animator>().enabled = true;
             visualCue.SetActive(true);
             if (InputManager.GetInstance().GetInteractPressed())
             {
-                DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
+                DialogueManager.GetInstance().EnterDialogueMode(inkJSON, GameObject.Find("Gun").GetComponent<Gun>());
             }
         }
         else
         {
+            gameObject.transform.parent.GetComponent<Animator>().enabled = false;
             visualCue.SetActive(false);
         }
     }

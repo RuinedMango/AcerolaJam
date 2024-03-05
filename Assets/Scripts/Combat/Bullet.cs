@@ -1,3 +1,4 @@
+using Ink.Parsed;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -6,6 +7,7 @@ public class Bullet : MonoBehaviour
     public float bulletSpeed;
     private float damage;
     private bool isTrigger;
+    public float delete = 7.5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,6 +27,7 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         rb.velocity = transform.right * bulletSpeed;
+        Destroy(gameObject, delete);
     }
 
     private void OnCollisionEnter2D(Collision2D collider)
@@ -38,7 +41,12 @@ public class Bullet : MonoBehaviour
             else
             {
                 collider.gameObject.GetComponent<SimpleAI>().Damage(damage);
+                Destroy(gameObject);
             }
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
     private void OnTriggerEnter2D(Collider2D collider)
@@ -50,6 +58,7 @@ public class Bullet : MonoBehaviour
         else
         {
             collider.gameObject.GetComponent<SimpleAI>().Damage(damage);
+            Destroy(gameObject);
         }
     }
 }

@@ -48,6 +48,7 @@ public class DialogueManager : MonoBehaviour
     private const string AUDIO_TAG = "audio";
 
     private DialogueVariables dialogueVariables;
+    private InkExternalFunctions inkExternalFunctions;
 
     private void Awake()
     {
@@ -58,8 +59,9 @@ public class DialogueManager : MonoBehaviour
         instance = this;
 
         dialogueVariables = new DialogueVariables(loadGlobalsJSON);
+        inkExternalFunctions = gameObject.AddComponent<InkExternalFunctions>();
 
-        audioSource = this.gameObject.AddComponent<AudioSource>();
+        audioSource = gameObject.AddComponent<AudioSource>();
         currentAudioInfo = defaultAudioInfo;
     }
 
@@ -90,8 +92,10 @@ public class DialogueManager : MonoBehaviour
 
     private void InitializeAudioInfoDictionary()
     {
-        audioInfoDictionary = new Dictionary<string, DialogueAudioInfoSO>();
-        audioInfoDictionary.Add(defaultAudioInfo.id, defaultAudioInfo);
+        audioInfoDictionary = new Dictionary<string, DialogueAudioInfoSO>
+        {
+            { defaultAudioInfo.id, defaultAudioInfo }
+        };
         foreach (DialogueAudioInfoSO audioInfo in audioInfos)
         {
             audioInfoDictionary.Add(audioInfo.id, audioInfo);
@@ -104,7 +108,7 @@ public class DialogueManager : MonoBehaviour
         audioInfoDictionary.TryGetValue(id, out audioInfo);
         if (audioInfo != null)
         {
-            this.currentAudioInfo = audioInfo;
+            currentAudioInfo = audioInfo;
         }
         else
         {
@@ -130,13 +134,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void EnterDialogueMode(TextAsset inkJSON)
+    public void EnterDialogueMode(TextAsset inkJSON, Gun gun)
     {
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
 
         dialogueVariables.StartListening(currentStory);
+        inkExternalFunctions.Bind(currentStory, gun);
 
         // reset portrait, layout, and speaker
         displayNameText.text = "???";
@@ -151,6 +156,7 @@ public class DialogueManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
+        inkExternalFunctions.Unbind(currentStory);
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
@@ -170,9 +176,18 @@ public class DialogueManager : MonoBehaviour
                 StopCoroutine(displayLineCoroutine);
             }
             string nextLine = currentStory.Continue();
-            // handle tags
-            HandleTags(currentStory.currentTags);
-            displayLineCoroutine = StartCoroutine(DisplayLine(nextLine));
+            // handle case where the last line is an external function
+            if (nextLine.Equals("") && !currentStory.canContinue)
+            {
+                StartCoroutine(ExitDialogueMode());
+            }
+            // otherwise, handle the normal case for continuing the story
+            else
+            {
+                // handle tags
+                HandleTags(currentStory.currentTags);
+                displayLineCoroutine = StartCoroutine(DisplayLine(nextLine));
+            }
         }
         else
         {

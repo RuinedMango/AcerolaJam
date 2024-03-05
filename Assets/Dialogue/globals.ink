@@ -1,1 +1,2 @@
-VAR explitives = ""
+VAR gun = ""
+EXTERNAL giveGun(gunName)

@@ -3,12 +3,11 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     public float damage = 10;
-    public float range = 100f;
 
     public float scatter;
 
     SimpleAI ai;
-    public Transform forwrd;
+    private Transform forwrd;
 
     [SerializeField]
     bool fireReady;
@@ -19,7 +18,6 @@ public class Gun : MonoBehaviour
     public bool auto;
 
     public GameObject bullet;
-    public GameObject bulletHole;
 
 
     void Start()
@@ -51,7 +49,7 @@ public class Gun : MonoBehaviour
     {
         for (int i = 0; i < bulletAmount; i++)
         {
-            Instantiate(bullet, this.transform.position, this.transform.rotation);
+            Instantiate(bullet, this.transform.position + (this.transform.up * Random.Range(-scatter, scatter)), this.transform.rotation);
         }
         Invoke(nameof(resetFireState), fireRate);
     }
@@ -59,5 +57,9 @@ public class Gun : MonoBehaviour
     {
         fireReady = true;
 
+    }
+    private void OnApplicationQuit()
+    {
+        bullet.GetComponent<Bullet>().delete = 7.5f;
     }
 }

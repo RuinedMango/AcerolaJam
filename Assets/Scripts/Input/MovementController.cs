@@ -25,9 +25,12 @@ public class MovementController : MonoBehaviour
     {
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
+            body.velocity = Vector3.zero;
+            body.freezeRotation = true;
             return;
         }
 
+        body.freezeRotation = false;
         HandleMove();
     }
     private void HandleMove()

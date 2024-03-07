@@ -184,7 +184,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      coast_sand_rocks_02_disp_4k_0: -6130050445970110756
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
